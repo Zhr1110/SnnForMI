@@ -6,12 +6,7 @@ import random
 class EEGset(Dataset):
     def __init__(self, root_path, pick_id=(1,), settup='train', T=125, EA=False, loo=False, all_id=range(1, 10)):
         self.T = T
-        if settup == 'train':
-            data_path = root_path + 'test/'
-        elif settup == 'test':
-            data_path = root_path + 'train/'
-        else:
-            data_path = root_path + settup + '/'
+        data_path = root_path + settup + '/'
         if loo:
             if EA:
                 data_path = data_path + 'EA/'

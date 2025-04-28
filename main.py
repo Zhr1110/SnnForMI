@@ -12,7 +12,7 @@ from tools import models
 
 parser = argparse.ArgumentParser(description='PyTorch Spiking Neural Network for MI')
 parser.add_argument('--dataset', type=int, default=0, help='Choose Dataset')
-parser.add_argument('--lr', type=float, default=1e-3, help='Learning Rate')
+parser.add_argument('--lr', type=float, default=1e-2, help='Learning Rate')
 parser.add_argument('--epoch', type=int, default=1500, help='Number of epochs for stage one')
 parser.add_argument('--epoch2', type=int, default=600, help='Number of epochs for stage two')
 parser.add_argument('--batch_size', type=int, default=16, help='Batch size')
@@ -185,8 +185,8 @@ def test(net, test_set, model_path, prms):
 
 if __name__ == '__main__':
     data_path = os.path.dirname(os.path.abspath(__file__)) + '/data/' + ['BNCI2014001/', 'BNCI2014002/', 'Weibo2014/'][prms['dataset']] + prms['prep']
-    if prms['model'] in ['FBCNet', 'FBMSNet']: data_path += 'filterbank/'
-    if prms['dataset'] == 2 or prms['model'] == 'FBMSNet': torch.set_num_threads(2)
+    if prms['model'] in ['FBCNet']: data_path += 'filterbank/'
+    if prms['dataset'] == 2: torch.set_num_threads(2)
     torch.cuda.set_device('cuda:{}'.format(prms['device']))
     print(prms)
     patience = prms['patience']
@@ -199,12 +199,10 @@ if __name__ == '__main__':
             model_path = data_path + prms['model'] + f'_id{ids}_seed{seedval}' + ('_loo' if prms['loo'] else '') + ('_EA' if prms['EA'] else '') + '.pth'
             if prms['model'] in ['ShallowConvNet', 'deepconv', 'EEGNet']:
                 net = getattr(models, prms['model'])(in_channels=[22, 15, 60][prms['dataset']], time_step=prms['T'], classes_num=[4, 2, 6][prms['dataset']]).cuda()
-            elif prms['model'] in ['FBCNet', 'FBMSNet']:
+            elif prms['model'] in ['FBCNet']:
                 net = getattr(models, prms['model'])(nChan=[22, 15, 60][prms['dataset']], nTime=prms['T'], nClass=[4, 2, 6][prms['dataset']]).cuda()
             elif prms['model'] in ['CUPY_SNN_PLIF']:
-                net = getattr(models, prms['model'])(in_channels=[22, 15, 60][prms['dataset']], out_num=[4, 2, 6][prms['dataset']], w=prms['w'], time_step=prms['T'], beta=prms['beta']).cuda()
-            elif prms['model'] in ['Conformer']:
-                net = getattr(models, prms['model'])(in_channels=[22, 15, 60][prms['dataset']], n_classes=[4, 2, 6][prms['dataset']]).cuda()
+                net = getattr(models, prms['model'])(in_channels=[22, 15, 60][prms['dataset']], out_num=[4, 2, 6][prms['dataset']], time_step=prms['T'], beta=prms['beta']).cuda()
             if trial_num == 0 and ids == 1: print(net)
             print(prms['model'] + f'_trial_num{trial_num}_id{ids}')
             train_set = EEGset(root_path=data_path, pick_id=(ids,), settup='train', T=prms['T'], loo=prms['loo'], all_id=[range(1, 10), range(1, 15), range(1, 11)][prms['dataset']], EA=prms['EA'])

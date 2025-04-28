@@ -25,7 +25,7 @@ def get_source_eeg_BNCI2014001(person_id, current_working_dir, train, resample_f
         path = current_working_dir + 'A' + f'{person_id:0>2}' + "T.gdf"
     else:
         path = current_working_dir + 'A' + f'{person_id:0>2}' + "E.gdf"
-        truth_path = current_working_dir + "true_label/" + "A0" + str(person_id) + "E.mat"
+        truth_path = current_working_dir + "A0" + str(person_id) + "E.mat"
     rawDataGDF = mne.io.read_raw_gdf(path, preload=True, exclude=['EOG-left', 'EOG-central', 'EOG-right']) 
     fs = int(rawDataGDF.info['sfreq'])
     event_position = rawDataGDF.annotations.onset  
